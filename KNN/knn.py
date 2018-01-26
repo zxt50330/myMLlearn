@@ -41,9 +41,6 @@ def file2matrix(filename):
         index += 1
     return returnMat, classLabelVector
 
-# datingDataMat, datingLabels = file2matrix('./datingTestSet.txt')
-# print(datingDataMat, datingLabels)
-
 
 def autoNorm(dataSet):
     """
@@ -92,7 +89,9 @@ def classifyPerson():
     print(resultList[classifierResult-1])
 
 
-import matplotlib.pyplot as plt
+# datingDataMat, datingLabels = file2matrix('./datingTestSet.txt')
+# print(datingDataMat, datingLabels)
+# import matplotlib.pyplot as plt
 # fig = plt.figure()
 # ax = fig.add_subplot(111) # 画布位置 将画布分割成1行1列，图像画在从左到右从上到下的第1块
 # ax.scatter(datingDataMat[:,0], datingDataMat[:,1], 15.0 * array(datingLabels), 15.0 * array(datingLabels))
