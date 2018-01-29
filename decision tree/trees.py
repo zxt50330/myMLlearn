@@ -21,7 +21,7 @@ def createDataSet():
                [1, 0, 'no'],
                [0, 1, 'no'],
                [0, 1, 'no']]
-    labels = ['no surfacing','flippers']
+    labels = ['no surfacing','flippers', 'head']
     return dataSet, labels
 
 
@@ -36,28 +36,23 @@ def splitDataSet(dataSet, axis, value):
     return retDataSet
 
 
-myDat, labels = createDataSet()
-# print(myDat)
-# print(calcShannonEnt(myDat))
-# print(splitDataSet(myDat, 0, 1))
-
 def chooseBestFeatureToSplit(dataSet):
     numFeatures = len(dataSet[0]) - 1
     baseEntropy = calcShannonEnt(dataSet)
-    print(baseEntropy)
+    # print(baseEntropy)
     bestInfoGain = 0.0
     bestFeature = -1
     for i in range(numFeatures):
         featList = [example[i] for example in dataSet]
         uniqueVals = set(featList)
-        print(uniqueVals)
+        # print(uniqueVals)
         newEntropy = 0.0
         for value in uniqueVals:
             subDataSet = splitDataSet(dataSet, i, value)
-            print(subDataSet)
+            # print(subDataSet)
             prob = len(subDataSet)/float(len(dataSet))
             newEntropy += prob * calcShannonEnt(subDataSet)
-            print(newEntropy)
+            # print(newEntropy)
         infoGain = baseEntropy - newEntropy
         if infoGain > bestInfoGain:
             bestInfoGain = infoGain
@@ -94,4 +89,46 @@ def createTree(dataSet, labels):
         myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), subLabels)
     return myTree
 
-print(createTree(myDat, labels))
+def classify(inputTree, featLabels, testVec):
+    firstStr =  list(inputTree.keys())[0]
+    secondDict = inputTree[firstStr]
+    print(featLabels)
+    featIndex = featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if isinstance(secondDict[key], dict):
+                classLabel = classify(secondDict[key], featLabels, testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
+
+
+def retrieveTree(i):
+    listOfTrees = [{'no surfacing': {0: 'no', 1: {'flippers': {0: 'no', 1: 'yes'}}}},
+                  {'no surfacing': {0: 'no', 1: {'flippers': {0: {'head': {0: 'no', 1: 'yes'}}, 1: 'no'}}}}
+                  ]
+    return listOfTrees[i]
+
+
+def storeTree(inputTree, filename):
+    import pickle
+    fw = open(filename, 'wb')
+    pickle.dump(inputTree, fw)
+    fw.close()
+
+
+def grabTree(filename):
+    import pickle
+    fr = open(filename, 'rb')
+    return pickle.load(fr)
+
+
+myDat, labels = createDataSet()
+# print(myDat, labels)
+myTree = retrieveTree(1)
+storeTree(myTree, './classifierStorage.txt')
+print(grabTree('./classifierStorage.txt'))
+# print(myTree)
+# print(classify(myTree, labels, [1, 0, 1]))
+# print(calcShannonEnt(myDat))
+# print(splitDataSet(myDat, 0, 1))
